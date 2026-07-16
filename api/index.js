@@ -33,11 +33,56 @@ app.get("/api/health", (_req, res) => {
   });
 });
 
+const samplePets = [
+  {
+    _id: "pet-1",
+    petName: "Milo",
+    category: "Dog",
+    breed: "Labrador",
+    age: "2 years",
+    gender: "Male",
+    location: "Colombo",
+    description: "Friendly and playful companion.",
+    images: [
+      "https://images.unsplash.com/photo-1517849845537-4d257902454a?auto=format&fit=crop&q=80&w=800",
+    ],
+    adoptionStatus: "Available",
+    vaccinated: true,
+    neutered: true,
+    isFeatured: true,
+  },
+  {
+    _id: "pet-2",
+    petName: "Luna",
+    category: "Cat",
+    breed: "Persian",
+    age: "1 year",
+    gender: "Female",
+    location: "Kandy",
+    description: "Gentle and affectionate cat.",
+    images: [
+      "https://images.unsplash.com/photo-1518791841217-8f162f1e1131?auto=format&fit=crop&q=80&w=800",
+    ],
+    adoptionStatus: "Available",
+    vaccinated: true,
+    neutered: true,
+    isFeatured: true,
+  },
+];
+
 app.get("/api/pets", (_req, res) => {
-  res.status(200).json({
-    message: "Pet listing endpoint is ready",
-    note: "Render deployment is running",
-  });
+  res.status(200).json(samplePets);
+});
+
+app.get("/api/pets/:id", (req, res) => {
+  const pet = samplePets.find((item) => item._id === req.params.id);
+
+  if (!pet) {
+    res.status(404).json({ error: "Pet not found" });
+    return;
+  }
+
+  res.status(200).json(pet);
 });
 
 app.get(["/favicon.ico", "/favicon.png"], (_req, res) => {

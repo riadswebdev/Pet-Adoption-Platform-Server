@@ -15,14 +15,11 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 exports.app = app;
 const port = Number(process.env["PORT"] || 8000);
-app.use(
-  (0, cors_1.default)({
-    origin:
-      process.env["CLIENT_URL"] ||
-      "https://pet-adoption-platform-drab.vercel.app",
+app.use((0, cors_1.default)({
+    origin: process.env["CLIENT_URL"] ||
+        "https://pet-adoption-platform-drab.vercel.app",
     credentials: true,
-  }),
-);
+}));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use("/api/pets", petRoutes_1.default);

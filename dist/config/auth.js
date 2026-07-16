@@ -7,11 +7,9 @@ exports.getAuth = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 const db_1 = require("./db");
 dotenv_1.default.config();
-const serverOrigin =
-  process.env["BETTER_AUTH_URL"] ||
-  "https://pet-adoption-platform-drab.vercel.app";
-const clientOrigin =
-  process.env["CLIENT_URL"] || "https://pet-adoption-platform-drab.vercel.app";
+const serverOrigin = process.env["BETTER_AUTH_URL"] ||
+    "https://pet-adoption-platform-drab.vercel.app";
+const clientOrigin = process.env["CLIENT_URL"] || "https://pet-adoption-platform-drab.vercel.app";
 let authInstance = null;
 const getAuth = async () => {
     if (authInstance) {
