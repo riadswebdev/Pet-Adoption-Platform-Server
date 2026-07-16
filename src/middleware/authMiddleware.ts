@@ -1,57 +1,12 @@
 import { Request, Response, NextFunction } from "express";
-import { auth } from "../config/auth";
-
-const buildHeaders = (req: Request): Record<string, string> => {
-  const headers: Record<string, string> = {};
-
-  if (req.headers.cookie) {
-    headers["cookie"] =
-      Array.isArray(req.headers.cookie) ?
-        req.headers.cookie.join("; ")
-      : req.headers.cookie;
-  }
-
-  if (req.headers.authorization) {
-    headers["authorization"] =
-      Array.isArray(req.headers.authorization) ?
-        req.headers.authorization.join(", ")
-      : req.headers.authorization;
-  }
-
-  return headers;
-};
-
-const normalizeAuthSession = async (req: Request) => {
-  const headers = buildHeaders(req);
-  const session = await auth.api.getSession({ headers });
-
-  if (!session?.user) {
-    return null;
-  }
-
-  return {
-    user: session.user,
-    session,
-  };
-};
 
 export const verifyToken = async (
-  req: Request,
+  _req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
   try {
-    const authState = await normalizeAuthSession(req);
-
-    if (!authState?.user) {
-      res.status(401).json({ error: "Unauthorized" });
-      return;
-    }
-
-    (req as Request & { user?: unknown; session?: unknown }).user =
-      authState.user;
-    (req as Request & { session?: unknown }).session = authState.session;
-    next();
+    res.status(401).json({ error: "Unauthorized" });
     return;
   } catch (error) {
     console.error("Auth middleware error:", error);

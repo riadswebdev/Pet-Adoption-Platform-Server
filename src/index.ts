@@ -1,8 +1,7 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-const { toNodeHandler } = require("better-auth/node");
-import { auth } from "./config/auth";
+import serverless from "serverless-http";
 import petRoutes from "./routes/petRoutes";
 import { getMyPets } from "./controllers/petController";
 import { requireAuth } from "./middleware/authMiddleware";
@@ -10,19 +9,18 @@ import { requireAuth } from "./middleware/authMiddleware";
 dotenv.config();
 
 const app = express();
-const port = process.env["PORT"] || 8000;
+const port = Number(process.env["PORT"] || 8000);
 
 app.use(
   cors({
-    origin: process.env["CLIENT_URL"] || "http://localhost:3000",
+    origin:
+      process.env["CLIENT_URL"] ||
+      "https://pet-adoption-platform-drab.vercel.app",
     credentials: true,
   }),
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-// Better Auth route
-app.use("/api/auth", toNodeHandler(auth));
 
 // Custom API routes
 app.use("/api/pets", petRoutes);
@@ -48,6 +46,14 @@ app.use(
   },
 );
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+if (!process.env["VERCEL"]) {
+  app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+  });
+}
+
+const handler = serverless(app);
+
+export { app, handler };
+export default handler;
+module.exports = handler;

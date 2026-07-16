@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "outputDirectory": ".",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api/index" },
+    { "source": "/", "destination": "/api/index" },
+    { "source": "/favicon.ico", "destination": "/api/index" },
+    { "source": "/favicon.png", "destination": "/api/index" },
+    { "source": "/(.*)", "destination": "/api/index" }
+  ]
+}
