@@ -1,53 +1,57 @@
-module.exports = function handler(req, res) {
-  const headers = {
-    "Access-Control-Allow-Origin": "*",
-    "Access-Control-Allow-Methods": "GET,POST,PUT,DELETE,OPTIONS",
-    "Access-Control-Allow-Headers": "Content-Type,Authorization",
-  };
+const express = require("express");
+const cors = require("cors");
+const dotenv = require("dotenv");
 
-  Object.entries(headers).forEach(([key, value]) => {
-    res.setHeader(key, value);
+dotenv.config();
+
+const app = express();
+const port = Number(process.env.PORT || 8000);
+const host = process.env.HOST || "0.0.0.0";
+
+app.use(
+  cors({
+    origin:
+      process.env.CLIENT_URL || "https://pet-adoption-platform-drab.vercel.app",
+    credentials: true,
+  }),
+);
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+app.get(["/", "/health"], (_req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Pet Adoption API is running",
   });
+});
 
-  if (req.method === "OPTIONS") {
-    res.status(204).end();
-    return;
-  }
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "Pet Adoption API is running",
+  });
+});
 
-  const url = new URL(
-    req.url || "/",
-    `https://${req.headers.host || "localhost"}`,
-  );
-  const pathname = url.pathname;
+app.get("/api/pets", (_req, res) => {
+  res.status(200).json({
+    message: "Pet listing endpoint is ready",
+    note: "Render deployment is running",
+  });
+});
 
-  if (pathname === "/" || pathname === "/health") {
-    res.status(200).json({
-      status: "OK",
-      message: "Pet Adoption API is running",
-    });
-    return;
-  }
+app.get(["/favicon.ico", "/favicon.png"], (_req, res) => {
+  res.status(204).end();
+});
 
-  if (pathname === "/api/health") {
-    res.status(200).json({
-      status: "OK",
-      message: "Pet Adoption API is running",
-    });
-    return;
-  }
-
-  if (pathname === "/api/pets") {
-    res.status(200).json({
-      message: "Pet listing endpoint is ready",
-      note: "This deployment uses a Vercel serverless entrypoint.",
-    });
-    return;
-  }
-
-  if (pathname === "/favicon.ico" || pathname === "/favicon.png") {
-    res.status(204).end();
-    return;
-  }
-
+app.use((_req, res) => {
   res.status(404).json({ error: "Not found" });
-};
+});
+
+if (require.main === module) {
+  app.listen(port, host, () => {
+    console.log(`Server listening on http://${host}:${port}`);
+  });
+}
+
+module.exports = app;
