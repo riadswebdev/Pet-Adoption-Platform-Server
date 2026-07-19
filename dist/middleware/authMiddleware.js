@@ -1,10 +1,24 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireRole = exports.requireAuth = exports.verifyToken = void 0;
-const verifyToken = async (_req, res, _next) => {
+const auth_1 = require("../config/auth");
+const verifyToken = async (req, res, next) => {
     try {
-        res.status(401).json({ error: "Unauthorized" });
-        return;
+        const auth = await (0, auth_1.getAuth)();
+        if (!auth) {
+            res.status(500).json({ error: "Auth not initialized" });
+            return;
+        }
+        const { fromNodeHeaders } = await import("better-auth/node");
+        const session = await auth.api.getSession({
+            headers: fromNodeHeaders(req.headers),
+        });
+        if (!session || !session.user) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+        req.user = session.user;
+        next();
     }
     catch (error) {
         console.error("Auth middleware error:", error);

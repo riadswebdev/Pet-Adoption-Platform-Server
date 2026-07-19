@@ -500,8 +500,16 @@ export const getAdminRecentActivity = async (
     const usersCollection = await getUsersCollection();
 
     const [recentPets, recentUsers] = await Promise.all([
-      petsCollection.find({}).sort({ createdAt: -1, updatedAt: -1 }).limit(10).toArray(),
-      usersCollection.find({}).sort({ createdAt: -1, updatedAt: -1 }).limit(10).toArray(),
+      petsCollection
+        .find({})
+        .sort({ createdAt: -1, updatedAt: -1 })
+        .limit(10)
+        .toArray(),
+      usersCollection
+        .find({})
+        .sort({ createdAt: -1, updatedAt: -1 })
+        .limit(10)
+        .toArray(),
     ]);
 
     const activities = [
@@ -524,41 +532,103 @@ export const getAdminRecentActivity = async (
       ...recentPets.map((petDoc) => {
         const record = petDoc as Record<string, unknown>;
         const status =
-          typeof record["adoptionStatus"] === "string"
-            ? record["adoptionStatus"]
-            : "Available";
+          typeof record["adoptionStatus"] === "string" ?
+            record["adoptionStatus"]
+          : "Available";
         const isAdoptionUpdate = status === "Pending" || status === "Adopted";
         const petName =
-          typeof record["petName"] === "string"
-            ? record["petName"]
-            : typeof record["title"] === "string"
-              ? record["title"]
-              : "A pet";
+          typeof record["petName"] === "string" ? record["petName"]
+          : typeof record["title"] === "string" ? record["title"]
+          : "A pet";
 
         return {
           id: `pet-${String(record["_id"])}`,
           type: isAdoptionUpdate ? "adoption_update" : "pet_listing",
           title: isAdoptionUpdate ? "Adoption update" : "New pet listing",
-          description: isAdoptionUpdate
-            ? `${petName} is now ${String(status).toLowerCase()}`
+          description:
+            isAdoptionUpdate ?
+              `${petName} is now ${String(status).toLowerCase()}`
             : `${petName} was listed for adoption`,
           createdAt: getDocumentTimestamp(record).toISOString(),
           actor:
-            typeof record["userName"] === "string"
-              ? record["userName"]
-              : "Pet owner",
+            typeof record["userName"] === "string" ?
+              record["userName"]
+            : "Pet owner",
         };
       }),
     ]
       .sort(
         (left, right) =>
-          new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime(),
+          new Date(right.createdAt).getTime() -
+          new Date(left.createdAt).getTime(),
       )
       .slice(0, 12);
 
     res.status(200).json(activities);
   } catch (error) {
     console.error("Error fetching admin recent activity:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getAdminUsers = async (
+  req: AuthenticatedRequest,
+  res: Response,
+) => {
+  try {
+    const user = req.user;
+
+    if (!user) {
+      res.status(401).json({ error: "Unauthorized" });
+      return;
+    }
+
+    if (!isAdminUser(user)) {
+      res.status(403).json({ error: "Forbidden: Admin access required" });
+      return;
+    }
+
+    const usersCollection = await getUsersCollection();
+    const users = await usersCollection
+      .find({})
+      .sort({ createdAt: -1, updatedAt: -1 })
+      .toArray();
+
+    const sanitizedUsers = users.map((userDoc) => {
+      const record = userDoc as Record<string, unknown>;
+      const name = typeof record["name"] === "string" ? record["name"] : "";
+      const email = typeof record["email"] === "string" ? record["email"] : "";
+      const role = typeof record["role"] === "string" ? record["role"] : "user";
+      const emailVerified =
+        record["emailVerified"] === true || record["emailVerified"] === "true";
+      const createdAtValue = record["createdAt"];
+      const updatedAtValue = record["updatedAt"];
+
+      return {
+        id: String(record["_id"]),
+        name,
+        email,
+        role: role.toLowerCase(),
+        emailVerified,
+        image: typeof record["image"] === "string" ? record["image"] : null,
+        phone: typeof record["phone"] === "string" ? record["phone"] : null,
+        address:
+          typeof record["address"] === "string" ? record["address"] : null,
+        bio: typeof record["bio"] === "string" ? record["bio"] : null,
+        createdAt:
+          createdAtValue instanceof Date ? createdAtValue.toISOString()
+          : typeof createdAtValue === "string" ? createdAtValue
+          : null,
+        updatedAt:
+          updatedAtValue instanceof Date ? updatedAtValue.toISOString()
+          : typeof updatedAtValue === "string" ? updatedAtValue
+          : null,
+      };
+    });
+
+    res.status(200).json(sanitizedUsers);
+  } catch (error) {
+    console.error("Error fetching admin users:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

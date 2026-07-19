@@ -4,3 +4,28 @@
 
 #HttpOnly_localhost	FALSE	/	FALSE	1784770426	better-auth.session_token	PoyfPzlbL2A3NFAZebwGFH2k8fMxg5uD.93403lfGgwFIOyWFqwAu%2BSOoizlkAzVjrm%2FkMN%2Bb1IY%3D
 #HttpOnly_localhost	FALSE	/	FALSE	1784770426	better-auth.session_data	eyJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uIjp7ImV4cGlyZXNBdCI6IjIwMjYtMDctMjNUMDE6MzM6NDYuNDAxWiIsInRva2VuIjoiUG95ZlB6bGJMMkEzTkZBWmVid0dGSDJrOGZNeGc1dUQiLCJjcmVhdGVkQXQiOiIyMDI2LTA3LTE2VDAxOjMzOjQ2LjQwMloiLCJ1cGRhdGVkQXQiOiIyMDI2LTA3LTE2VDAxOjMzOjQ2LjQwMloiLCJpcEFkZHJlc3MiOiIiLCJ1c2VyQWdlbnQiOiJjdXJsLzguMjAuMCIsInVzZXJJZCI6IjZhNTgyOGJhMGZhZDZiNTg4MTI0ZmNmZiIsImlkIjoiNmE1ODM0ZmFjYjFjYzIwMDIwMDBlYzI5In0sInVzZXIiOnsibmFtZSI6IkRlYnVnIFVzZXIiLCJlbWFpbCI6ImRlYnVndXNlckBleGFtcGxlLmNvbSIsImVtYWlsVmVyaWZpZWQiOmZhbHNlLCJjcmVhdGVkQXQiOiIyMDI2LTA3LTE2VDAwOjQxOjMwLjY4NVoiLCJ1cGRhdGVkQXQiOiIyMDI2LTA3LTE2VDAwOjQxOjMwLjY4NVoiLCJyb2xlIjoidXNlciIsImlkIjoiNmE1ODI4YmEwZmFkNmI1ODgxMjRmY2ZmIn0sInVwZGF0ZWRBdCI6MTc4NDE2NTYyNjQ4NCwidmVyc2lvbiI6IjEiLCJpYXQiOjE3ODQxNjU2MjYsImV4cCI6MTc4NDc3MDQyNn0.dGz7WQv9DhK_PEcmzcBkTsga4iX7esZ-5IdexQIbWN8
+
+
+
+
+Please update the 'Manage User' section in the admin dashboard. Remove the current hardcoded mock data and implement dynamic data fetching from the MongoDB database, specifically handling the API logic inside the 'pet-adoption-server' folder and displaying the data in the client-side 'pet-adoption-platform' folder. You can include action buttons if appropriate, but they are optional.
+
+
+
+Please update the 'Manage User' section in the admin dashboard. Remove the 'Status' column, and include the specific user data based on the example I will provide. In the action column, add a 'View' button. Clicking this button should open a neat modal that displays detailed information about the user or admin.
+
+user data example:
+
+{
+_id: 6a5b1e0c9f9e4421aa9c93d5
+name:"MD RIAD SHEKH"
+email:"djriad157764@gmail.com"
+emailVerified:false
+image:"https://ik.imagekit.io/i455l48ls/profile-photoaidcom-cropped%20(1).png…"
+createdAt:2026-07-18T06:32:44.031+00:00
+updatedAt:2026-07-18T13:02:10.177+00:00
+role:"admin"
+address:"Adarhat "
+bio:"A.       B.     C.       D"
+phone:"+8801314674108"
+}

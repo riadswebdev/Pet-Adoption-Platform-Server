@@ -2,11 +2,12 @@
   "name": "pet-adoption-server",
   "version": "1.0.0",
   "description": "",
-  "main": "api/index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "build": "npm install",
-    "start": "node api/index.js",
-    "dev": "node api/index.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts",
+    "test:auth": "node test-auth.js"
   },
   "keywords": [],
   "author": "",

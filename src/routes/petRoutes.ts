@@ -11,6 +11,7 @@ import {
   getAdminDashboardStats,
   getAdminRecentActivity,
   getAllPetsForAdmin,
+  getAdminUsers,
   getCurrentUserProfile,
 } from "../controllers/petController";
 import { requireAuth, requireRole } from "../middleware/authMiddleware";
@@ -31,6 +32,7 @@ router.get(
   getAdminRecentActivity,
 );
 router.get("/admin/all", requireAuth, requireRole(["admin"]), getAllPetsForAdmin);
+router.get("/admin/users", requireAuth, requireRole(["admin"]), getAdminUsers);
 router.put("/admin/:id/status", requireAuth, requireRole(["admin"]), updatePetStatus);
 
 // Protected user routes

@@ -10,6 +10,7 @@ router.get("/me/summary", authMiddleware_1.requireAuth, petController_1.getMyPet
 router.get("/admin/stats", authMiddleware_1.requireAuth, (0, authMiddleware_1.requireRole)(["admin"]), petController_1.getAdminDashboardStats);
 router.get("/admin/recent-activity", authMiddleware_1.requireAuth, (0, authMiddleware_1.requireRole)(["admin"]), petController_1.getAdminRecentActivity);
 router.get("/admin/all", authMiddleware_1.requireAuth, (0, authMiddleware_1.requireRole)(["admin"]), petController_1.getAllPetsForAdmin);
+router.get("/admin/users", authMiddleware_1.requireAuth, (0, authMiddleware_1.requireRole)(["admin"]), petController_1.getAdminUsers);
 router.put("/admin/:id/status", authMiddleware_1.requireAuth, (0, authMiddleware_1.requireRole)(["admin"]), petController_1.updatePetStatus);
 router.get("/my-pets", authMiddleware_1.requireAuth, (0, authMiddleware_1.requireRole)(["user"]), petController_1.getMyPets);
 router.post("/", authMiddleware_1.requireAuth, (0, authMiddleware_1.requireRole)(["user"]), petController_1.createPet);

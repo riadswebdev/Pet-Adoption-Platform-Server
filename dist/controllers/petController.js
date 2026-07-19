@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getCurrentUserProfile = exports.updatePetStatus = exports.getAllPetsForAdmin = exports.getAdminDashboardStats = exports.getAdminRecentActivity = exports.getMyPetsSummary = exports.getMyPets = exports.deletePet = exports.updatePet = exports.createPet = exports.getPetById = exports.getPets = void 0;
+exports.getCurrentUserProfile = exports.updatePetStatus = exports.getAllPetsForAdmin = exports.getAdminDashboardStats = exports.getAdminUsers = exports.getAdminRecentActivity = exports.getMyPetsSummary = exports.getMyPets = exports.deletePet = exports.updatePet = exports.createPet = exports.getPetById = exports.getPets = void 0;
 const mongodb_1 = require("mongodb");
 const db_1 = __importDefault(require("../config/db"));
 const Pet_1 = require("../models/Pet");
@@ -458,6 +458,50 @@ const getAdminRecentActivity = async (req, res) => {
     }
 };
 exports.getAdminRecentActivity = getAdminRecentActivity;
+const getAdminUsers = async (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            res.status(401).json({ error: "Unauthorized" });
+            return;
+        }
+        if (!isAdminUser(user)) {
+            res.status(403).json({ error: "Forbidden: Admin access required" });
+            return;
+        }
+        const usersCollection = await getUsersCollection();
+        const users = await usersCollection
+            .find({})
+            .sort({ createdAt: -1, updatedAt: -1 })
+            .toArray();
+        const sanitizedUsers = users.map((userDoc) => {
+            const record = userDoc;
+            const name = typeof record["name"] === "string" ? record["name"] : "";
+            const email = typeof record["email"] === "string" ? record["email"] : "";
+            const role = typeof record["role"] === "string" ? record["role"] : "user";
+            const emailVerified = record["emailVerified"] === true || record["emailVerified"] === "true";
+            const createdAtValue = record["createdAt"];
+            return {
+                id: String(record["_id"]),
+                name,
+                email,
+                role: role.toLowerCase(),
+                status: emailVerified ? "active" : "pending",
+                image: typeof record["image"] === "string" ? record["image"] : null,
+                phone: typeof record["phone"] === "string" ? record["phone"] : null,
+                createdAt: createdAtValue instanceof Date ? createdAtValue.toISOString()
+                    : typeof createdAtValue === "string" ? createdAtValue
+                        : null,
+            };
+        });
+        res.status(200).json(sanitizedUsers);
+    }
+    catch (error) {
+        console.error("Error fetching admin users:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+    }
+};
+exports.getAdminUsers = getAdminUsers;
 const getAdminDashboardStats = async (req, res) => {
     try {
         const user = req.user;

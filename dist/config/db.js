@@ -21,13 +21,15 @@ if (uri) {
         clientPromise = global._mongoClientPromise;
     }
     else {
-        client = new mongodb_1.MongoClient(uri);
+        client = new mongodb_1.MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
         clientPromise = client.connect();
+        clientPromise.catch((err) => console.error("MongoDB connection error:", err.message));
     }
     exports.db = db = client.db("pet_adoption");
 }
 else {
     clientPromise = Promise.reject(new Error("MONGODB_URI is not configured. Set it to enable database routes."));
+    clientPromise.catch(() => { });
 }
 exports.default = clientPromise;
 //# sourceMappingURL=db.js.map

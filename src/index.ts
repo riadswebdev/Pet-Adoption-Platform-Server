@@ -11,18 +11,71 @@ dotenv.config();
 const app = express();
 const port = Number(process.env["PORT"] || 8000);
 
-app.use(
-  cors({
-    origin:
-      process.env["CLIENT_URL"] ||
-      "https://pet-adoption-platform-drab.vercel.app",
-    credentials: true,
-  }),
+const allowedOrigins = [
+  process.env["CLIENT_URL"],
+  process.env["BETTER_AUTH_URL"],
+  "https://pet-adoption-platform-drab.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:3001",
+].filter(Boolean) as string[];
+
+const corsOptions = {
+  origin: (
+    origin: string | undefined,
+    callback: (err: Error | null, allow?: boolean) => void,
+  ) => {
+    if (
+      !origin ||
+      allowedOrigins.includes(origin) ||
+      origin.endsWith(".vercel.app") ||
+      origin.endsWith(".vercel.app/")
+    ) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Not allowed by CORS"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  exposedHeaders: ["Set-Cookie"],
+};
+
+app.use(cors(corsOptions as cors.CorsOptions));
+app.options(
+  /(.*)/,
+  cors(corsOptions as cors.CorsOptions),
+  (_req, res) => {
+    res.sendStatus(204);
+  },
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+import { getAuth } from "./config/auth";
+
 // Custom API routes
+app.all("/api/auth/*splat", async (req, res) => {
+  try {
+    const auth = await getAuth();
+    if (!auth) {
+      res
+        .status(500)
+        .json({ error: "Auth not initialized. Check MONGODB_URI." });
+      return;
+    }
+
+    const { toNodeHandler } = await import("better-auth/node");
+    const handler = toNodeHandler(auth);
+    await handler(req, res);
+  } catch (error) {
+    console.error("Better Auth Route Error:", error);
+    if (!res.headersSent) {
+      res.status(500).json({ error: "Internal Server Error in Auth Route" });
+    }
+  }
+});
 app.use("/api/pets", petRoutes);
 app.get("/api/my-pets", requireAuth, getMyPets);
 
@@ -56,4 +109,3 @@ const handler = serverless(app);
 
 export { app, handler };
 export default handler;
-module.exports = handler;

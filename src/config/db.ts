@@ -26,8 +26,9 @@ if (uri) {
     clientPromise = global._mongoClientPromise;
   } else {
     // In production mode, create a fresh client.
-    client = new MongoClient(uri);
+    client = new MongoClient(uri, { serverSelectionTimeoutMS: 5000 });
     clientPromise = client.connect();
+    clientPromise.catch((err) => console.error("MongoDB connection error:", err.message));
   }
 
   db = client.db("pet_adoption");
@@ -35,6 +36,7 @@ if (uri) {
   clientPromise = Promise.reject(
     new Error("MONGODB_URI is not configured. Set it to enable database routes."),
   );
+  clientPromise.catch(() => {}); // prevent unhandled rejection crash
 }
 
 export default clientPromise;

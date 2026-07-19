@@ -20,6 +20,7 @@ export declare const deletePet: (req: AuthenticatedRequest, res: Response) => Pr
 export declare const getMyPets: (req: AuthenticatedRequest, res: Response) => Promise<void>;
 export declare const getMyPetsSummary: (req: AuthenticatedRequest, res: Response) => Promise<void>;
 export declare const getAdminRecentActivity: (req: AuthenticatedRequest, res: Response) => Promise<void>;
+export declare const getAdminUsers: (req: AuthenticatedRequest, res: Response) => Promise<void>;
 export declare const getAdminDashboardStats: (req: AuthenticatedRequest, res: Response) => Promise<void>;
 export declare const getAllPetsForAdmin: (req: AuthenticatedRequest, res: Response) => Promise<void>;
 export declare const updatePetStatus: (req: AuthenticatedRequest, res: Response) => Promise<void>;
